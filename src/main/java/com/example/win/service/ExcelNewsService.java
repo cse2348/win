@@ -72,7 +72,7 @@ public class ExcelNewsService {
                 String summary;
                 try {
                     System.out.println(i + "번째 뉴스 요약 시작: " + title);
-                    summary = openAiChatService.summarizeContent(content);
+                    summary = openAiChatService.summarizeContent(content, "매우 쉬움");
                 } catch (Exception e) {
                     System.out.println("GPT 요약 실패: " + e.getMessage());
                     summary = "요약 실패";
