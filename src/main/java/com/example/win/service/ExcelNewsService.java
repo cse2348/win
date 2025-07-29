@@ -20,7 +20,7 @@ import java.util.List;
 public class ExcelNewsService {
 
     private final NewsRepository newsRepository;
-    private final OpenAiChatService openAiChatService; // 분리된 OpenAI 서비스 주입
+    private final OpenAiChatService openAiChatService;
 
     @Transactional
     public void loadExcelDataToDb(String filePath) {
@@ -43,11 +43,9 @@ public class ExcelNewsService {
                 String link = row.getCell(2).getStringCellValue();
                 String content = row.getCell(3).getStringCellValue();
 
-                System.out.println((i) + "번째 뉴스 요약 시작: " + title);
-                // 1. ChatGPT로 내용 요약 (분리된 서비스 호출)
+                System.out.println(i + "번째 뉴스 요약 시작: " + title);
                 String summary = openAiChatService.summarizeContent(content);
 
-                // 2. News 엔티티 생성
                 News news = News.builder()
                         .title(title)
                         .publicationDate(LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy.MM.dd")))
@@ -56,14 +54,18 @@ public class ExcelNewsService {
                         .summary(summary)
                         .build();
 
-                // 3. DB에 저장
                 newsRepository.save(news);
             }
+
             System.out.println("뉴스 데이터 로딩 및 요약 완료!");
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("엑셀 파일 처리 중 심각한 오류가 발생했습니다.", e);
+            throw new RuntimeException("엑셀 파일 처리 중 오류가 발생했습니다.", e);
         }
+    }
+
+    public void save(News news) {
+        newsRepository.save(news);
     }
 
     @Transactional(readOnly = true)

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,4 +52,21 @@ public class NewsUploadController {
         }
         return text; // '.'이 없으면 전체 반환
     }
+    /**
+     * 테스트용 뉴스 더미 데이터 삽입
+     */
+    @GetMapping("/insert-dummy")
+    public ResponseEntity<String> insertDummyNews() {
+        News dummy = News.builder()
+                .title("테스트 뉴스입니다")
+                .summary("이것은 요약 테스트 문장입니다. 추가 내용 생략.")
+                .originalContent("이것은 원문 내용입니다.")
+                .originalLink("https://example.com")
+                .publicationDate(LocalDate.now())
+                .build();
+
+        newsService.save(dummy);
+        return ResponseEntity.ok("더미 뉴스 저장 완료!");
+    }
+
 }
