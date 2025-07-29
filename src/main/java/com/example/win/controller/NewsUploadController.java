@@ -25,35 +25,27 @@ public class NewsUploadController {
      */
     @GetMapping("/latest")
     public ResponseEntity<List<NewsCardDto>> getLatestNewsCards() {
-        // 서비스에서 최신 뉴스 5개를 가져옴
         List<News> latestNews = newsService.getLatestNews(5);
-
-        // DTO로 변환
         List<NewsCardDto> newsCards = latestNews.stream()
                 .map(news -> NewsCardDto.builder()
                         .id(news.getId())
                         .title(news.getTitle())
-                        .summary(getFirstSentence(news.getSummary())) // 요약문 중 첫 문장만 추출
-                        .representativeImageUrl("https://picsum.photos/300/200?random=" + news.getId()) // 임시 이미지 URL
+                        .summary(getFirstSentence(news.getSummary()))
+                        .representativeImageUrl("https://picsum.photos/300/200?random=" + news.getId())
                         .build())
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(newsCards);
     }
 
-    // 요약문에서 첫 번째 문장만 깔끔하게 추출하는 헬퍼 메서드
     private String getFirstSentence(String text) {
-        if (text == null || text.isEmpty()) {
-            return "";
-        }
+        if (text == null || text.isEmpty()) return "";
         int firstPeriod = text.indexOf('.');
-        if (firstPeriod != -1) {
-            return text.substring(0, firstPeriod + 1);
-        }
-        return text; // '.'이 없으면 전체 반환
+        return firstPeriod != -1 ? text.substring(0, firstPeriod + 1) : text;
     }
+
     /**
-     * 테스트용 뉴스 더미 데이터 삽입
+     * 테스트용 단일 뉴스 더미 저장
      */
     @GetMapping("/insert-dummy")
     public ResponseEntity<String> insertDummyNews() {
@@ -69,4 +61,16 @@ public class NewsUploadController {
         return ResponseEntity.ok("더미 뉴스 저장 완료!");
     }
 
+    /**
+     * 엑셀에서 뉴스 일괄 로딩
+     */
+    @GetMapping("/load-from-excel")
+    public ResponseEntity<String> insertNewsFromExcel() {
+        try {
+            newsService.loadExcelDataToDb("data/news.xlsx");
+            return ResponseEntity.ok("엑셀에서 뉴스 데이터 로딩 성공!");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("엑셀 로딩 실패: " + e.getMessage());
+        }
+    }
 }
