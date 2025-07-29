@@ -87,23 +87,21 @@ public class ExcelNewsService {
                         if (line.toLowerCase().contains("키워드")) {
                             String extracted = line.replaceAll("(?i)\\[?키워드\\]?[:：]?", "").trim();
                             String[] tags = extracted.split("[,\\s#]+");
-
-                            keywords = Arrays.stream(tags)
+                            keywords += Arrays.stream(tags)
                                     .map(tag -> tag.replaceAll("[^\\p{IsAlphabetic}\\p{IsDigit}가-힣]", "").trim())
                                     .filter(tag -> !tag.isBlank())
-                                    .distinct()
-                                    .limit(4)
                                     .map(tag -> "#" + tag)
-                                    .collect(Collectors.joining(" "));
-                        } else if (line.toLowerCase().contains("요약")) {
-                            summaryText = line.replaceAll("(?i)\\[?요약\\]?[:：]?", "").trim();
+                                    .collect(Collectors.joining(" ", keywords.isEmpty() ? "" : " ", ""));
                         } else if (line.matches("^(#\\w+\\s*){2,}")) {
-                            keywords = Arrays.stream(line.trim().split("[\\s#]+"))
+                            keywords += Arrays.stream(line.trim().split("[\\s#]+"))
                                     .filter(tag -> !tag.isBlank())
-                                    .distinct()
-                                    .limit(4)
                                     .map(tag -> "#" + tag)
-                                    .collect(Collectors.joining(" "));
+                                    .collect(Collectors.joining(" ", keywords.isEmpty() ? "" : " ", ""));
+                        } else if (line.toLowerCase().contains("요약")) {
+                            String extracted = line.replaceAll("(?i)\\[?요약\\]?[:：]?", "").trim();
+                            if (!extracted.isEmpty()) {
+                                summaryText += (summaryText.isEmpty() ? "" : " ") + extracted;
+                            }
                         }
                     }
 
