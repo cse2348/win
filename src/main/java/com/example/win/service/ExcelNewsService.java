@@ -76,19 +76,23 @@ public class ExcelNewsService {
                 try {
                     System.out.println(i + "번째 뉴스 요약 시작: " + title);
                     summaryRaw = openAiChatService.summarizeContent(content, "매우 쉬움");
-
                     System.out.println("GPT 응답:\n" + summaryRaw);
 
                     for (String line : summaryRaw.split("\n")) {
                         line = line.trim();
-                        if (line.toLowerCase().contains("키워드")) {
+
+                        // 키워드 파싱
+                        if (line.toLowerCase().contains("키워드") || line.matches("^#?\\w+(\\s+#?\\w+)*$")) {
                             keywords = line.replaceAll("(?i)\\[?키워드\\]?[:：]?", "").trim();
-                        } else if (line.toLowerCase().contains("요약")) {
+                        }
+
+                        // 요약 파싱
+                        else if (line.toLowerCase().contains("요약")) {
                             summaryText = line.replaceAll("(?i)\\[?요약\\]?[:：]?", "").trim();
                         }
                     }
 
-                    // 혹시 응답이 한 줄일 경우
+                    // 혹시 [요약]이 붙은 한 줄 응답 처리
                     if ((keywords.isEmpty() || summaryText.isEmpty()) && summaryRaw.contains("[") && summaryRaw.contains("#")) {
                         String[] parts = summaryRaw.split("\\[요약\\]");
                         if (parts.length == 2) {
