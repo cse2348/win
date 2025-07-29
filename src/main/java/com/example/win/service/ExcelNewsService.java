@@ -29,9 +29,9 @@ public class ExcelNewsService {
     @Transactional
     public void loadExcelDataToDb(String filePath) {
         String category = extractCategoryFromFileName(filePath);
-
         System.out.println(filePath + "에서 [" + category + "] 뉴스 데이터를 로딩합니다...");
-        try (InputStream is = getClass().getClassLoader().getResourceAsStream(filePath);
+
+        try (InputStream is = getExcelFileAsStream(filePath);
              Workbook workbook = new XSSFWorkbook(is)) {
 
             Sheet sheet = workbook.getSheetAt(0);
@@ -44,7 +44,6 @@ public class ExcelNewsService {
                 String link = row.getCell(2).getStringCellValue().trim();
                 String content = row.getCell(3).getStringCellValue().trim();
 
-                // 이미지 URL (5번째 열)
                 String imageUrl;
                 try {
                     imageUrl = row.getCell(4) != null ? row.getCell(4).getStringCellValue().trim() : "";
@@ -55,7 +54,6 @@ public class ExcelNewsService {
                     imageUrl = "https://picsum.photos/300/200?random=" + i;
                 }
 
-                // 날짜 파싱
                 LocalDate date;
                 try {
                     LocalDateTime dt = LocalDateTime.parse(dateStr, formatter);
@@ -65,14 +63,12 @@ public class ExcelNewsService {
                     continue;
                 }
 
-                // 중복 방지
                 boolean exists = newsRepository.existsByTitleAndPublicationDate(title, date);
                 if (exists) {
                     System.out.println("[" + title + "] 이미 존재함, 스킵");
                     continue;
                 }
 
-                // GPT 요약
                 String summary;
                 try {
                     System.out.println(i + "번째 뉴스 요약 시작: " + title);
@@ -96,10 +92,19 @@ public class ExcelNewsService {
             }
 
             System.out.println("[" + category + "] 뉴스 데이터 로딩 및 요약 완료!");
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("엑셀 파일 처리 중 오류가 발생했습니다.", e);
         }
+    }
+
+    private InputStream getExcelFileAsStream(String filePath) {
+        InputStream stream = getClass().getClassLoader().getResourceAsStream(filePath);
+        if (stream == null) {
+            throw new RuntimeException("엑셀 파일을 찾을 수 없습니다: " + filePath);
+        }
+        return stream;
     }
 
     @Transactional

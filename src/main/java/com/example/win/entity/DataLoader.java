@@ -14,6 +14,6 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // resources 폴더 아래에 data 폴더를 만들고 news.xlsx 파일을 넣어주세요.
-        excelNewsService.loadExcelDataToDb("data/news.xlsx");
+        excelNewsService.loadExcelDataToDb("data/politics.xlsx");
     }
 }
