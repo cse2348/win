@@ -1,12 +1,14 @@
 package com.example.win.service;
 
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,15 +27,21 @@ public class OpenAiChatService {
                     .temperature(0.5)
                     .build();
 
-            String result = openAiService.createChatCompletion(request)
-                    .getChoices().get(0).getMessage().getContent().trim();
-            System.out.println("GPT 응답:\n" + result);
-            return result;
+            ChatCompletionResult result = openAiService.createChatCompletion(request);
+            List<com.theokanning.openai.completion.chat.ChatCompletionChoice> choices = result.getChoices();
 
+            if (choices == null || choices.isEmpty()) {
+                System.err.println("GPT 응답 실패: 응답 내용이 비어 있음");
+                return "요약 실패";
+            }
+
+            String response = choices.get(0).getMessage().getContent().trim();
+            System.out.println("GPT 응답:\n" + response);
+            return response;
 
         } catch (Exception e) {
             System.err.println("GPT API 호출 중 오류 발생: " + e.getMessage());
-            return content.substring(0, Math.min(content.length(), 150)) + "... (요약 중 오류 발생)";
+            return "요약 실패";
         }
     }
 
