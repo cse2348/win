@@ -64,4 +64,4 @@ jobs:
               --name app \
               --env-file .env \
               -p 8080:8080 \
-              {여기에 이미지 repo}:latest
+              {여기에  이미지 repo}:latest
