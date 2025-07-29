@@ -37,7 +37,6 @@ public class OpenAiChatService {
             return openAiService.createChatCompletion(request).getChoices().get(0).getMessage().getContent().trim();
         } catch (Exception e) {
             System.err.println("GPT API 호출 중 오류 발생: " + e.getMessage());
-            // API 호출 실패 시, 원문의 앞부분을 잘라서 임시 요약문으로 반환
             return content.substring(0, Math.min(content.length(), 150)) + "... (요약 중 오류 발생)";
         }
     }
@@ -49,6 +48,9 @@ public class OpenAiChatService {
      * @return GPT가 생성한 이미지 프롬프트 (영어, 장면 묘사 중심)
      */
     public String generateImagePrompt(String title, String summary) {
+        if (title == null) title = "";
+        if (summary == null) summary = "";
+
         String imagePromptRequest =
                 "뉴스 제목: " + title + "\n" +
                         "요약: " + summary + "\n\n" +
@@ -67,7 +69,6 @@ public class OpenAiChatService {
             return openAiService.createChatCompletion(request).getChoices().get(0).getMessage().getContent().trim();
         } catch (Exception e) {
             System.err.println("GPT 이미지 프롬프트 생성 중 오류 발생: " + e.getMessage());
-            // 실패 시 기본 프롬프트 반환
             return "A symbolic image representing the news topic with a realistic atmosphere.";
         }
     }
