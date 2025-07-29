@@ -63,10 +63,10 @@ public class ExcelNewsService {
                     continue;
                 }
 
-                boolean exists = newsRepository.existsByTitleAndPublicationDate(title, date);
-                if (exists) {
-                    System.out.println("[" + title + "] 이미 존재함, 스킵");
-                    continue;
+                if (newsRepository.existsByTitleAndPublicationDate(title, date)) {
+                    System.out.println("[" + title + "] 이미 존재함 → 덮어쓰기");
+                    News existing = newsRepository.findByTitleAndPublicationDate(title, date);
+                    newsRepository.delete(existing);
                 }
 
                 String summaryRaw;

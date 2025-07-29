@@ -15,4 +15,7 @@ public interface NewsRepository extends JpaRepository<News, Long> {
 
     // 제목과 날짜로 중복 여부 확인
     boolean existsByTitleAndPublicationDate(String title, LocalDate publicationDate);
+
+    // 덮어쓰기용 - 기존 뉴스 1개 찾기
+    News findByTitleAndPublicationDate(String title, LocalDate publicationDate);
 }
