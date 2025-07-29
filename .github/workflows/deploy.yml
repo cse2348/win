@@ -46,71 +46,11 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_KEY }}
           script: |
-            echo 'SPRING_DATASOURCE_URL="${{ secrets.SPRING_DATASOURCE_URL }}"' > .env
-            echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> .env
-            echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> .env
-            name: Deploy to EC2
-
-on:
-  push:
-    branches: [ "main" ]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    env:
-      AWS_REGION: ap-northeast-2
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-
-      - name: Build
-        run: ./gradlew clean build -x test
-
-      - name: Login to ECR
-        uses: aws-actions/amazon-ecr-login@v1
-        with:
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Build and Push Docker Image
-        run: |
-          IMAGE_URI=228041307119.dkr.ecr.ap-northeast-2.amazonaws.com/winner-repo:latest
-          docker build -t $IMAGE_URI .
-          docker push $IMAGE_URI
-
-      - name: SSH into EC2 and Deploy
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            echo 'SPRING_DATASOURCE_URL="${{ secrets.SPRING_DATASOURCE_URL }}"' > .env
+            echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" > .env
             echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> .env
             echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> .env
             echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
-            
-            docker stop app || true && docker rm app || true
-            docker pull 228041307119.dkr.ecr.ap-northeast-2.amazonaws.com/winner-repo:latest
-            docker run -d \
-              --name app \
-              --env-file .env \
-              -p 8080:8080 \
-              228041307119.dkr.ecr.ap-northeast-2.amazonaws.com/winner-repo:latest
-            
-            
+
             docker stop app || true && docker rm app || true
             docker pull 228041307119.dkr.ecr.ap-northeast-2.amazonaws.com/winner-repo:latest
             docker run -d \
