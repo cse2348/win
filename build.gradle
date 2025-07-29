@@ -27,10 +27,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mustache'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
-	// Apache POI (엑셀 처리 + 로그 관련 의존성 포함)
-	implementation 'org.apache.poi:poi:5.2.2'
+	// Apache POI (Excel 처리용)
+	implementation 'org.apache.poi:poi:5.4.0'
 	implementation 'org.apache.poi:poi-ooxml:5.4.0'
 	implementation 'org.apache.poi:poi-ooxml-full:5.4.0'
+
+	// Log4j (POI 내부 의존)
 	implementation 'org.apache.logging.log4j:log4j-api:2.17.2'
 	implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
 
