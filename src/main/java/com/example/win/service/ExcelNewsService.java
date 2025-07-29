@@ -24,6 +24,7 @@ public class ExcelNewsService {
 
     private final NewsRepository newsRepository;
     private final OpenAiChatService openAiChatService;
+    private final OpenAiImageService openAiImageService; // 이미지 생성 서비스 추가
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd. a h:mm", Locale.KOREAN);
 
@@ -55,7 +56,7 @@ public class ExcelNewsService {
                     date = dt.toLocalDate();
                 } catch (DateTimeParseException e) {
                     System.out.println("날짜 파싱 실패: " + dateStr);
-                    continue; // 건너뛰기
+                    continue;
                 }
 
                 // GPT 요약
@@ -68,18 +69,30 @@ public class ExcelNewsService {
                     summary = "요약 실패";
                 }
 
+                // GPT 이미지 프롬프트 → DALL·E 이미지 URL
+                String imagePrompt;
+                String imageUrl;
+                try {
+                    imagePrompt = openAiChatService.generateImagePrompt(title, summary);
+                    imageUrl = openAiImageService.generateImage(imagePrompt);
+                } catch (Exception e) {
+                    System.out.println("대표 이미지 생성 실패: " + e.getMessage());
+                    imageUrl = "https://picsum.photos/300/200?random=" + i;
+                }
+
                 News news = News.builder()
                         .title(title)
                         .publicationDate(date)
                         .originalLink(link)
                         .originalContent(content)
                         .summary(summary)
+                        .representativeImageUrl(imageUrl)
                         .build();
 
                 newsRepository.save(news);
             }
 
-            System.out.println("뉴스 데이터 로딩 및 요약 완료!");
+            System.out.println("뉴스 데이터 로딩 및 요약/이미지 생성 완료!");
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("엑셀 파일 처리 중 오류가 발생했습니다.", e);

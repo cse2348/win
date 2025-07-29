@@ -34,6 +34,9 @@ public class News {
     @Column(nullable = false)
     private String originalLink;
 
+    @Column(name = "representative_image_url", columnDefinition = "TEXT")
+    private String representativeImageUrl; // DALL·E 이미지 URL
+
     // 감정 피드백 카운트 (추후 확장용)
     private int likedCount = 0;
     private int confusedCount = 0;

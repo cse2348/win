@@ -6,6 +6,7 @@ import com.theokanning.openai.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Service
@@ -38,6 +39,36 @@ public class OpenAiChatService {
             System.err.println("GPT API 호출 중 오류 발생: " + e.getMessage());
             // API 호출 실패 시, 원문의 앞부분을 잘라서 임시 요약문으로 반환
             return content.substring(0, Math.min(content.length(), 150)) + "... (요약 중 오류 발생)";
+        }
+    }
+
+    /**
+     * 뉴스 제목과 요약문을 바탕으로 이미지 생성을 위한 프롬프트를 요청합니다.
+     * @param title 뉴스 제목
+     * @param summary 요약된 뉴스 내용
+     * @return GPT가 생성한 이미지 프롬프트 (영어, 장면 묘사 중심)
+     */
+    public String generateImagePrompt(String title, String summary) {
+        String imagePromptRequest =
+                "뉴스 제목: " + title + "\n" +
+                        "요약: " + summary + "\n\n" +
+                        "위 뉴스를 바탕으로 현실감 있는 대표 이미지를 생성할 수 있도록 영어로 프롬프트를 만들어줘. " +
+                        "프롬프트에는 장소, 등장 인물, 배경, 분위기, 상황이 포함되어야 해. " +
+                        "형식은 하나의 영어 문장으로 만들어줘. 다른 설명 없이 프롬프트 문장만 출력해.";
+
+        try {
+            ChatCompletionRequest request = ChatCompletionRequest.builder()
+                    .model("gpt-4o")
+                    .messages(Collections.singletonList(new ChatMessage("user", imagePromptRequest)))
+                    .maxTokens(300)
+                    .temperature(0.7)
+                    .build();
+
+            return openAiService.createChatCompletion(request).getChoices().get(0).getMessage().getContent().trim();
+        } catch (Exception e) {
+            System.err.println("GPT 이미지 프롬프트 생성 중 오류 발생: " + e.getMessage());
+            // 실패 시 기본 프롬프트 반환
+            return "A symbolic image representing the news topic with a realistic atmosphere.";
         }
     }
 }
