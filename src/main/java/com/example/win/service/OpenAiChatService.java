@@ -25,8 +25,11 @@ public class OpenAiChatService {
                     .temperature(0.5)
                     .build();
 
-            return openAiService.createChatCompletion(request)
+            String result = openAiService.createChatCompletion(request)
                     .getChoices().get(0).getMessage().getContent().trim();
+            System.out.println("GPT 응답:\n" + result);
+            return result;
+
 
         } catch (Exception e) {
             System.err.println("GPT API 호출 중 오류 발생: " + e.getMessage());
