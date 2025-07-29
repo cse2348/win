@@ -12,8 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +24,8 @@ public class ExcelNewsService {
 
     private final NewsRepository newsRepository;
     private final OpenAiChatService openAiChatService;
+
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd. a h:mm", Locale.KOREAN);
 
     @Transactional
     public void loadExcelDataToDb(String filePath) {
@@ -43,12 +48,29 @@ public class ExcelNewsService {
                 String link = row.getCell(2).getStringCellValue();
                 String content = row.getCell(3).getStringCellValue();
 
-                System.out.println(i + "번째 뉴스 요약 시작: " + title);
-                String summary = openAiChatService.summarizeContent(content);
+                // 날짜 파싱
+                LocalDate date;
+                try {
+                    LocalDateTime dt = LocalDateTime.parse(dateStr, formatter);
+                    date = dt.toLocalDate();
+                } catch (DateTimeParseException e) {
+                    System.out.println("날짜 파싱 실패: " + dateStr);
+                    continue; // 건너뛰기
+                }
+
+                // GPT 요약
+                String summary;
+                try {
+                    System.out.println(i + "번째 뉴스 요약 시작: " + title);
+                    summary = openAiChatService.summarizeContent(content);
+                } catch (Exception e) {
+                    System.out.println("GPT 요약 실패: " + e.getMessage());
+                    summary = "요약 실패";
+                }
 
                 News news = News.builder()
                         .title(title)
-                        .publicationDate(LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy.MM.dd")))
+                        .publicationDate(date)
                         .originalLink(link)
                         .originalContent(content)
                         .summary(summary)
