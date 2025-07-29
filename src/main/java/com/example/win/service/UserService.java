@@ -20,6 +20,12 @@ public class UserService {
 
     // 회원가입
     public void signup(SignupRequestDto requestDto) {
+        System.out.println(">>> 이름: " + requestDto.getName());
+        System.out.println(">>> 전화번호: " + requestDto.getPhoneNumber());
+        System.out.println(">>> 패스워드: " + requestDto.getPassword());
+        System.out.println(">>> 지역: " + requestDto.getRegion());
+        System.out.println(">>> 나이: " + requestDto.getAge());
+        System.out.println(">>> 보호자 번호: " + requestDto.getGuardianPhoneNumber());
         if (userRepository.existsByPhoneNumber(requestDto.getPhoneNumber())) {
             throw new IllegalArgumentException("이미 가입된 전화번호입니다.");
         }

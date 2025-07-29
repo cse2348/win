@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Component
+
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -24,7 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        // 요청 헤더에서 Authorization 추출
+        // Authorization 헤더에서 토큰 추출
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -40,12 +40,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String phoneNumber = jwtUtil.getPhoneNumberFromToken(token);
 
-        // 인증 객체 생성 후 컨텍스트에 저장
+        // 인증 객체 생성
         UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(phoneNumber, null, null); // 권한은 null
+                new UsernamePasswordAuthenticationToken(phoneNumber, null, null);
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        boolean result = path.equals("/api/users/login") || path.equals("/api/users/signup");
+        System.out.println("[JwtFilter] skip 여부: " + path + " → " + result);
+        return result;
     }
 }

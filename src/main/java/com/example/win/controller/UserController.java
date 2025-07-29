@@ -6,10 +6,9 @@ import com.example.win.dto.SignupRequestDto;
 import com.example.win.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,13 +17,21 @@ public class UserController {
 
     private final UserService userService;
 
-
+    // 회원가입
     @PostMapping("/signup")
-    public String signup(@RequestBody SignupRequestDto requestDto) {
-        userService.signup(requestDto);
-        return "회원가입 성공";
+    public ResponseEntity<?> signup(@RequestBody SignupRequestDto requestDto) {
+        try {
+            userService.signup(requestDto);
+            return ResponseEntity.ok(Map.of("message", "회원가입 성공"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "회원가입 실패",
+                    "message", e.getMessage()
+            ));
+        }
     }
 
+    // 로그인
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto requestDto) {
         LoginResponseDto responseDto = userService.login(requestDto);
