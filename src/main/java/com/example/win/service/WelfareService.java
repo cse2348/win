@@ -5,13 +5,16 @@ import com.example.win.repository.WelfareRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class WelfareService {
 
     private final WelfareRepository welfareRepository;
+
+    // 북마크 목록 (메모리 기반 임시 저장)
+    private final Set<Long> bookmarkedWelfareIds = new HashSet<>();
 
     // 복지정보 등록
     public Welfare saveWelfare(Welfare welfare) {
@@ -32,5 +35,24 @@ public class WelfareService {
     // 삭제
     public void deleteWelfare(Long id) {
         welfareRepository.deleteById(id);
+        bookmarkedWelfareIds.remove(id); // 삭제 시 북마크에서도 제거
+    }
+
+    // 북마크 추가
+    public void addBookmark(Long welfareId) {
+        if (!welfareRepository.existsById(welfareId)) {
+            throw new IllegalArgumentException("해당 복지 ID가 존재하지 않습니다.");
+        }
+        bookmarkedWelfareIds.add(welfareId);
+    }
+
+    // 북마크 해제
+    public void removeBookmark(Long welfareId) {
+        bookmarkedWelfareIds.remove(welfareId);
+    }
+
+    // 내 북마크 목록 조회
+    public List<Welfare> getMyBookmarks() {
+        return welfareRepository.findAllById(bookmarkedWelfareIds);
     }
 }
