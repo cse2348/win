@@ -29,7 +29,7 @@ dependencies {
 
 	// Apache POI (엑셀 처리)
 	implementation 'org.apache.poi:poi:5.2.2'
-	implementation 'org.apache.poi:poi-ooxml:5.2.2'
+	implementation 'org.apache.poi:poi-ooxml:5.4.0'
 
 	// DB
 	runtimeOnly 'com.h2database:h2'
