@@ -31,7 +31,7 @@ public class NewsUploadController {
                         .id(news.getId())
                         .title(news.getTitle())
                         .summary(getFirstSentence(news.getSummary()))
-                        .representativeImageUrl("https://picsum.photos/300/200?random=" + news.getId())
+                        .representativeImageUrl(news.getRepresentativeImageUrl()) // DB에 저장된 URL 사용
                         .build())
                 .collect(Collectors.toList());
 
@@ -55,6 +55,8 @@ public class NewsUploadController {
                 .originalContent("이것은 원문 내용입니다.")
                 .originalLink("https://example.com")
                 .publicationDate(LocalDate.now())
+                .representativeImageUrl("https://picsum.photos/300/200?random=dummy")
+                .category("테스트")
                 .build();
 
         newsService.save(dummy);
@@ -67,7 +69,10 @@ public class NewsUploadController {
     @GetMapping("/load-from-excel")
     public ResponseEntity<String> insertNewsFromExcel() {
         try {
-            newsService.loadExcelDataToDb("data/news.xlsx");
+            newsService.loadExcelDataToDb("data/politics.xlsx");
+            newsService.loadExcelDataToDb("data/economy.xlsx");
+            newsService.loadExcelDataToDb("data/society.xlsx");
+            newsService.loadExcelDataToDb("data/culture.xlsx");
             return ResponseEntity.ok("엑셀에서 뉴스 데이터 로딩 성공!");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("엑셀 로딩 실패: " + e.getMessage());
