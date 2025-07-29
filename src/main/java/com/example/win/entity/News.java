@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
 @Data
@@ -26,7 +27,7 @@ public class News {
     private String originalContent;
 
     @Column(columnDefinition = "TEXT", nullable = false)
-    private String summary; // GPT로 요약된 내용
+    private String summary;
 
     @Column(nullable = false)
     private LocalDate publicationDate;
@@ -35,9 +36,11 @@ public class News {
     private String originalLink;
 
     @Column(name = "representative_image_url", columnDefinition = "TEXT")
-    private String representativeImageUrl; // DALL·E 이미지 URL
+    private String representativeImageUrl;
 
-    // 감정 피드백 카운트 (추후 확장용)
+    @Column(nullable = false)
+    private String category;
+
     private int likedCount = 0;
     private int confusedCount = 0;
     private int sadCount = 0;
