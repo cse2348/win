@@ -69,6 +69,7 @@ public class ExcelNewsService {
                     System.out.println("[" + title + "] 이미 존재함 → 덮어쓰기");
                     News existing = newsRepository.findByTitleAndPublicationDate(title, date);
                     newsRepository.delete(existing);
+                    newsRepository.flush();
                 }
 
                 String summaryRaw;
