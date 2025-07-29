@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
@@ -67,13 +68,11 @@ public class NewsUploadController {
      * 엑셀에서 뉴스 일괄 로딩
      */
     @GetMapping("/load-from-excel")
-    public ResponseEntity<String> insertNewsFromExcel() {
+    public ResponseEntity<String> insertNewsFromExcel(@RequestParam String filename) {
         try {
-            newsService.loadExcelDataToDb("data/politics.xlsx");
-            newsService.loadExcelDataToDb("data/economy.xlsx");
-            newsService.loadExcelDataToDb("data/society.xlsx");
-            newsService.loadExcelDataToDb("data/culture.xlsx");
-            return ResponseEntity.ok("엑셀에서 뉴스 데이터 로딩 성공!");
+            String path = "data/" + filename;
+            newsService.loadExcelDataToDb(path);
+            return ResponseEntity.ok("엑셀에서 뉴스 데이터 로딩 성공: " + filename);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("엑셀 로딩 실패: " + e.getMessage());
         }
