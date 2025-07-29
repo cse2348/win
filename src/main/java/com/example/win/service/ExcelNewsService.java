@@ -13,8 +13,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -81,22 +83,40 @@ public class ExcelNewsService {
                     for (String line : summaryRaw.split("\n")) {
                         line = line.trim();
 
-                        // 키워드 파싱
-                        if (line.toLowerCase().contains("키워드") || line.matches("^#?\\w+(\\s+#?\\w+)*$")) {
-                            keywords = line.replaceAll("(?i)\\[?키워드\\]?[:：]?", "").trim();
-                        }
+                        if (line.toLowerCase().contains("키워드")) {
+                            String extracted = line.replaceAll("(?i)\\[?키워드\\]?[:：]?", "").trim();
+                            String[] tags = extracted.split("[,\\s#]+");
 
-                        // 요약 파싱
-                        else if (line.toLowerCase().contains("요약")) {
+                            keywords = Arrays.stream(tags)
+                                    .map(tag -> tag.replaceAll("[^\\p{IsAlphabetic}\\p{IsDigit}가-힣]", "").trim())
+                                    .filter(tag -> !tag.isBlank())
+                                    .distinct()
+                                    .limit(4)
+                                    .map(tag -> "#" + tag)
+                                    .collect(Collectors.joining(" "));
+                        } else if (line.toLowerCase().contains("요약")) {
                             summaryText = line.replaceAll("(?i)\\[?요약\\]?[:：]?", "").trim();
+                        } else if (line.matches("^(#\\w+\\s*){2,}")) {
+                            keywords = Arrays.stream(line.trim().split("[\\s#]+"))
+                                    .filter(tag -> !tag.isBlank())
+                                    .distinct()
+                                    .limit(4)
+                                    .map(tag -> "#" + tag)
+                                    .collect(Collectors.joining(" "));
                         }
                     }
 
-                    // 혹시 [요약]이 붙은 한 줄 응답 처리
                     if ((keywords.isEmpty() || summaryText.isEmpty()) && summaryRaw.contains("[") && summaryRaw.contains("#")) {
                         String[] parts = summaryRaw.split("\\[요약\\]");
                         if (parts.length == 2) {
-                            keywords = parts[0].replace("[키워드]", "").trim();
+                            String[] tags = parts[0].replace("[키워드]", "").split("[,\\s#]+");
+                            keywords = Arrays.stream(tags)
+                                    .map(tag -> tag.replaceAll("[^\\p{IsAlphabetic}\\p{IsDigit}가-힣]", "").trim())
+                                    .filter(tag -> !tag.isBlank())
+                                    .distinct()
+                                    .limit(4)
+                                    .map(tag -> "#" + tag)
+                                    .collect(Collectors.joining(" "));
                             summaryText = parts[1].trim();
                         }
                     }
