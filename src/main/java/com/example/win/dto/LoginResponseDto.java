@@ -14,4 +14,5 @@ import lombok.Builder;
 public class LoginResponseDto {
     private String message;
     private Long userId;
+    private String token;
 }
