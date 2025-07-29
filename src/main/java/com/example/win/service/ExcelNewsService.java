@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Locale;
 
 @Service
@@ -99,6 +100,17 @@ public class ExcelNewsService {
             e.printStackTrace();
             throw new RuntimeException("엑셀 파일 처리 중 오류가 발생했습니다.", e);
         }
+    }
+
+    @Transactional
+    public void save(News news) {
+        newsRepository.save(news);
+    }
+
+    @Transactional(readOnly = true)
+    public List<News> getLatestNews(int count) {
+        List<News> allNews = newsRepository.findAllByOrderByPublicationDateDesc();
+        return allNews.subList(0, Math.min(count, allNews.size()));
     }
 
     private String extractCategoryFromFileName(String filePath) {

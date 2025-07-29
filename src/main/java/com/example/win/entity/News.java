@@ -41,7 +41,13 @@ public class News {
     @Column(nullable = false)
     private String category;
 
+    @Builder.Default
     private int likedCount = 0;
+
+    @Builder.Default
     private int confusedCount = 0;
+
+    @Builder.Default
     private int sadCount = 0;
+
 }

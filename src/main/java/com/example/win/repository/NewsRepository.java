@@ -9,7 +9,10 @@ import java.util.List;
 
 @Repository
 public interface NewsRepository extends JpaRepository<News, Long> {
+
     // 최신순으로 뉴스를 조회하는 메서드
     List<News> findAllByOrderByPublicationDateDesc();
+
+    // 제목과 날짜로 중복 여부 확인
     boolean existsByTitleAndPublicationDate(String title, LocalDate publicationDate);
 }
