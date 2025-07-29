@@ -31,6 +31,7 @@ public class NewsUploadController {
                 .map(news -> NewsCardDto.builder()
                         .id(news.getId())
                         .title(news.getTitle())
+                        .keywords(news.getKeywords())
                         .summary(getFirstSentence(news.getSummary()))
                         .representativeImageUrl(news.getRepresentativeImageUrl()) // DB에 저장된 URL 사용
                         .build())
