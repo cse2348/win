@@ -2,7 +2,7 @@ name: Deploy to EC2  # 이 워크플로우의 이름. GitHub Actions 탭에 표�
 
 on:
   push:
-    branches: [ "master" ]  # main 브랜치에 push될 때만 이 워크플로우가 실행됨
+    branches: [ "main" ]  # main 브랜치에 push될 때만 이 워크플로우가 실행됨
 
 jobs:
   deploy:
@@ -35,7 +35,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          IMAGE_URI={여기에 이미지 repo}:latest  # 사용할 Docker 이미지 태그 정의
+          IMAGE_URI=228041307119.dkr.ecr.ap-northeast-2.amazonaws.com/winner-repo:latest  # 사용할 Docker 이미지 태그 정의
           docker build -t $IMAGE_URI .  # 현재 디렉토리(.)에 있는 Dockerfile을 기준으로 이미지 빌드
           docker push $IMAGE_URI  # 빌드한 이미지를 ECR에 push (업로드)
 
@@ -51,7 +51,7 @@ jobs:
             echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> .env
 
             docker stop app || true && docker rm app || true
-            docker pull {여기에 이미지 repo}:latest
+            docker pull 228041307119.dkr.ecr.ap-northeast-2.amazonaws.com/winner-repo:latest
             docker run -d \
               --name app \
               --env-file .env \
@@ -59,9 +59,9 @@ jobs:
               {여기에 이미지 repo}:latest
             
             docker stop app || true && docker rm app || true
-            docker pull {여기에 이미지 repo}:latest
+            docker pull 228041307119.dkr.ecr.ap-northeast-2.amazonaws.com/winner-repo:latest
             docker run -d \
               --name app \
               --env-file .env \
               -p 8080:8080 \
-              {여기에  이미지 repo}:latest
+              228041307119.dkr.ecr.ap-northeast-2.amazonaws.com/winner-repo:latest
