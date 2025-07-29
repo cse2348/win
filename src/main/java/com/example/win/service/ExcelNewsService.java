@@ -69,13 +69,29 @@ public class ExcelNewsService {
                     continue;
                 }
 
-                String summary;
+                String summaryRaw;
+                String summaryText = "";
+                String keywords = "";
+
                 try {
                     System.out.println(i + "번째 뉴스 요약 시작: " + title);
-                    summary = openAiChatService.summarizeContent(content, "매우 쉬움");
+                    summaryRaw = openAiChatService.summarizeContent(content, "매우 쉬움");
+
+                    for (String line : summaryRaw.split("\n")) {
+                        if (line.startsWith("[키워드]")) {
+                            keywords = line.replace("[키워드]", "").trim();
+                        } else if (line.startsWith("[요약]")) {
+                            summaryText = line.replace("[요약]", "").trim();
+                        }
+                    }
+
+                    if (summaryText.isEmpty()) summaryText = "요약 실패";
+                    if (keywords.isEmpty()) keywords = "#요약실패";
+
                 } catch (Exception e) {
                     System.out.println("GPT 요약 실패: " + e.getMessage());
-                    summary = "요약 실패";
+                    summaryText = "요약 실패";
+                    keywords = "#요약실패";
                 }
 
                 News news = News.builder()
@@ -83,7 +99,8 @@ public class ExcelNewsService {
                         .publicationDate(date)
                         .originalLink(link)
                         .originalContent(content)
-                        .summary(summary)
+                        .summary(summaryText)
+                        .keywords(keywords)
                         .representativeImageUrl(imageUrl)
                         .category(category)
                         .build();

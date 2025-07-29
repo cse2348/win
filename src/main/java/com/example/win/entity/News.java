@@ -38,6 +38,9 @@ public class News {
     @Column(name = "representative_image_url", columnDefinition = "TEXT")
     private String representativeImageUrl;
 
+    @Column(length = 255)
+    private String keywords;
+
     @Column(nullable = false)
     private String category;
 
