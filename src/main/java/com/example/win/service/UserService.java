@@ -1,0 +1,32 @@
+package com.example.win.service;
+
+import com.example.win.dto.LoginRequestDto;
+import com.example.win.dto.LoginResponseDto;
+import com.example.win.entity.User;
+import com.example.win.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public LoginResponseDto login(LoginRequestDto requestDto) {
+        User user = userRepository.findByPhoneNumber(requestDto.getPhoneNumber())
+                .orElseThrow(() -> new IllegalArgumentException("해당 전화번호로 가입된 사용자가 없습니다."));
+
+        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        return LoginResponseDto.builder()
+                .message("로그인 성공")
+                .userId(user.getId())
+                .build();
+    }
+}
