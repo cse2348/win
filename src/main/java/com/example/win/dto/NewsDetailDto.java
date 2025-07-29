@@ -10,6 +10,7 @@ import java.time.LocalDate;
 public class NewsDetailDto {
     private Long id;
     private String title;
+    private String keywords;
     private String summary;
     private LocalDate publicationDate;
     private String originalLink;
@@ -18,6 +19,7 @@ public class NewsDetailDto {
         return NewsDetailDto.builder()
                 .id(news.getId())
                 .title(news.getTitle())
+                .keywords(news.getKeywords())
                 .summary(news.getSummary())
                 .publicationDate(news.getPublicationDate())
                 .originalLink(news.getOriginalLink())

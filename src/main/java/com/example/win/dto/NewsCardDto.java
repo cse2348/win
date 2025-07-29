@@ -8,7 +8,8 @@ import lombok.Data;
 public class NewsCardDto {
     private Long id;
     private String title;
+    private String keywords;
     private String summary; // 요약된 한 문장
     private String representativeImageUrl;
-    private String keywords;
+
 }
