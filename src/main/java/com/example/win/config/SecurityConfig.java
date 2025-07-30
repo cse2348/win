@@ -71,6 +71,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Preflight
                         .requestMatchers(HttpMethod.POST, "/api/users/login", "/api/users/signup").permitAll()
                         .requestMatchers("/api/news/latest").permitAll()
+                        .requestMatchers("/api/welfare/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()
                 )
