@@ -52,12 +52,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
+        String method = request.getMethod();
+
         boolean result =
-                path.equals("/api/users/login") ||
-                        path.equals("/api/users/signup") ||
-                        path.equals("/api/news/latest") ||
+                (path.equals("/api/users/login") && method.equals("POST")) ||
+                        (path.equals("/api/users/signup") && method.equals("POST")) ||
+                        (path.equals("/api/news/latest") && method.equals("GET")) ||
+                        (path.equals("/api/welfare/generate") && (method.equals("GET") || method.equals("POST"))) ||
+                        (path.equals("/api/welfare") && method.equals("GET")) ||
                         path.equals("/health");
-        System.out.println("[JwtFilter] skip 여부: " + path + " → " + result);
+
+        System.out.println("[JwtFilter] skip 여부: " + method + " " + path + " → " + result);
         return result;
     }
+
 }
