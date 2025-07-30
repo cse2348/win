@@ -72,6 +72,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users/login", "/api/users/signup").permitAll()
                         .requestMatchers("/api/news/latest").permitAll()
                         .requestMatchers("/api/welfare/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/welfare/generate").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()
                 )
