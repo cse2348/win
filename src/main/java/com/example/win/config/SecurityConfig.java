@@ -12,9 +12,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Configuration
@@ -24,7 +23,7 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
 
-    // JWT 필터 직접 빈으로 등록
+    // JWT 필터 등록
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(jwtUtil);
@@ -34,21 +33,6 @@ public class SecurityConfig {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    // CORS 설정
-    @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.setAllowedOriginPatterns(List.of("*"));
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-
-        return new CorsFilter(source);
     }
 
     // 보안 설정 전체 구성
@@ -68,16 +52,19 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Preflight
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users/login", "/api/users/signup").permitAll()
-                        .requestMatchers("/api/news/latest").permitAll()
-                        .requestMatchers("/api/welfare/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/news/latest").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/welfare/generate").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/welfare/generate").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .logout(logout -> logout.logoutSuccessUrl("/login"));
+                .logout(logout -> logout
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                        })
+                );
 
         http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
