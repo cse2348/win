@@ -52,7 +52,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        boolean result = path.equals("/api/users/login") || path.equals("/api/users/signup");
+        boolean result =
+                path.equals("/api/users/login") ||
+                        path.equals("/api/users/signup") ||
+                        path.equals("/api/news/latest") ||
+                        path.equals("/health");
         System.out.println("[JwtFilter] skip 여부: " + path + " → " + result);
         return result;
     }
