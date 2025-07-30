@@ -98,12 +98,12 @@
 
 ## 📁 프로젝트 구조
 backend/
-├── controller/       # REST API 컨트롤러
-├── dto/              # DTO 클래스
-├── entity/           # JPA 엔티티
-├── repository/       # JPA 리포지토리
-├── service/          # 비즈니스 로직
-├── config/           # 설정 파일
+├── controller/ # REST API 컨트롤러
+├── dto/ # DTO 클래스
+├── entity/ # JPA 엔티티
+├── repository/ # JPA 리포지토리
+├── service/ # 비즈니스 로직
+├── config/ # 설정 파일
 └── resources/
 └── application.yml
 
